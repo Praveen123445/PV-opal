@@ -30,6 +30,7 @@ const CreateWorkspace = (props: Props) => {
           </Button>
         }
       >
+        
         <WorkspaceForm /> 
       </Modal>
     );
