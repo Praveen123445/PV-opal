@@ -8,6 +8,9 @@ import React from 'react'
 import CopyLink from '../copy-link'
 import RichLink from '../rich-link'
 import { truncateString } from '@/lib/utils'
+import { Download } from 'lucide-react'
+import TabMenu from '../../tabs'
+import AiTools from '../../ai-tools'
 
 type Props = {
     videoId: string
@@ -81,7 +84,7 @@ const VideoPreview = ({ videoId }: Props) => {
         </div>
       </div>
       <div className='lg:col-span-1 flex-col gap-y-16'>
-        <div className='flex justify-end gap-x-3'>
+        <div className='flex justify-end gap-x-3 items-center'>
             <CopyLink
               variant='outline'
               className='rounded-full bg-transparent px-10'
@@ -93,8 +96,15 @@ const VideoPreview = ({ videoId }: Props) => {
             source={video.source}
             title={video.title as string}
           />
+          <Download className='text-white'/>
         </div>
       </div>
+      <TabMenu 
+        defaultValue='Ai tools' 
+        triggers={['Ai tools', 'Transcript', 'Activity']}
+      >
+        <AiTools/>
+      </TabMenu>
     </div>
   )
 }
