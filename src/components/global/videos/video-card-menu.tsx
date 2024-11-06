@@ -24,16 +24,16 @@ const CardMenu = ({
       trigger={
         <Move
           size={20}
-          fill='a4a4a4'
-          className='text-[#a4a4a4]'
+          fill='4f4f4f'
+          className='text-[#4f4f4f]'
         />
       }
     >
         <ChangeVideoLocation
           currentFolderName={currentFolderName}
           videoId={videoId}
-          currentWorkspace={currentWorkspace}
-          currentFolder={currentFolderName}
+          currentWorkSpace={currentWorkspace}
+          currentFolder={currentFolder}
         />
     </Modal>
   )

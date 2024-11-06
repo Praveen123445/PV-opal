@@ -2,7 +2,6 @@
 
 import { client } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
-import { tree } from "next/dist/build/templates/app-page";
 
 export const verifyAccessToWorkspace = async (workspaceId: string) => {
   try {
@@ -211,6 +210,7 @@ export const renameFolders = async (folderId: string, name: string) => {
       return { status: 200, data: "Folder Renamed" };
     }
     return { status: 400, data: "Folder does not exist" };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return { status: 500, data: "Opps! something went wrong" };
   }
@@ -232,6 +232,7 @@ export const createFolder = async (workspaceId: string) => {
       return { status: 200, message: "New Folder Created" };
     }
     return { status: 400, message: "Could not create folder" };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return { status: 500, message: "Opps something went wrong" };
   }
@@ -261,10 +262,80 @@ export const getFolderInfo = async (folderId: string) => {
       status: 400,
       data: null,
     };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     return {
-        status: 500,
-        data: null,
-      };
+      status: 500,
+      data: null,
+    };
+  }
+};
+
+export const moveVideoLocation = async (
+  videoId: string,
+  workSpaceId: string,
+  folderId: string
+) => {
+  try {
+    const location = await client.video.update({
+      where: {
+        id: videoId,
+      },
+      data: {
+        folderId: folderId || null,
+        workSpaceId,
+      },
+    });
+    if (location) return { status: 200, data: "folder changed successfully" };
+    return { status: 404, data: "workspace/folder not found" };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return { status: 500, data: "Oops! something went wrong" };
+  }
+};
+
+export const getPreviewVideo = async (videoId: string) => {
+  try {
+    const user = await currentUser();
+    if (!user) return { status: 404 };
+    const video = await client.video.findUnique({
+      where: {
+        id: videoId,
+      },
+      select: {
+        title: true,
+        createdAt: true,
+        source: true,
+        description: true,
+        processing: true,
+        views: true,
+        summery: true,
+        User: {
+          select: {
+            firstname: true,
+            lastname: true,
+            image: true,
+            clerkid: true,
+            trial: true,
+            subscription: {
+              select: {
+                plan: true,
+              },
+            },
+          },
+        },
+      },
+    })
+    if (video) {
+      return {
+        status: 200,
+        date: video,
+        author: user.id === video.User?.clerkid ? true : false,
+      }
+    }
+    return { status: 404 }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return { status: 400}
   }
 };
