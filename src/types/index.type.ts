@@ -1,21 +1,21 @@
 export type WorkspaceProps = {
-    data:{
-        subscription: {
-            plan: "FREE" | "PRO"
-        } | null
-        workspace: {
-            id: string
-            name: string
-            type: "PUBLIC" | "PERSONAL"
-        }[]
-        members:{
-            WorkSpace: {
-                id: string
-                name: string
-                type: "PUBLIC" | "PERSONAL"
-            }
-        }[]
-    }
+  data: {
+    subscription: {
+      plan: 'FREE' | 'PRO'
+    } | null
+    workspace: {
+      id: string
+      name: string
+      type: 'PUBLIC' | 'PERSONAL'
+    }[]
+    members: {
+      WorkSpace: {
+        id: string
+        name: string
+        type: 'PUBLIC' | 'PERSONAL'
+      }
+    }[]
+  }
 }
 
 export type NotificationProps = {
@@ -81,3 +81,45 @@ export type VideoProps = {
     author: boolean
   }
   
+  export type CommentRepliesProps = {
+    id: string
+    comment: string
+    createdAt: Date
+    commentId: string | null
+    userId: string | null
+    videoId: string | null
+    User: {
+      id: string
+      email: string
+      firstname: string | null
+      lastname: string | null
+      createdAt: Date
+      clerkid: string
+      image: string | null
+      trial: boolean
+      firstView: boolean
+    } | null
+  }
+
+  export type VideoCommentProps = {
+    data: {
+      User: {
+        id: string
+        email: string
+        firstname: string | null
+        lastname: string | null
+        createdAt: Date
+        clerkid: string
+        image: string | null
+        trial: boolean
+        firstView: boolean
+      } | null
+      reply: CommentRepliesProps[]
+      id: string
+      comment: string
+      createdAt: Date
+      commentId: string | null
+      userId: string | null
+      videoId: string | null
+    }[]
+  }

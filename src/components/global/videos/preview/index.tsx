@@ -1,16 +1,18 @@
 'use client'
 
-import { getPreviewVideo } from '@/actions/workspace'
+import { getPreviewVideo, sendEmailForFirstView } from '@/actions/workspace'
 import { useQueryData } from '@/hooks/useQueryData'
 import { VideoProps } from '@/types/index.type'
 import { useRouter } from 'next/navigation'
-import React from 'react'
+import React, { useEffect } from 'react'
 import CopyLink from '../copy-link'
 import RichLink from '../rich-link'
 import { truncateString } from '@/lib/utils'
 import { Download } from 'lucide-react'
 import TabMenu from '../../tabs'
 import AiTools from '../../ai-tools'
+import VideoTranscript from '../../video-transcript'
+import Activities from '../../activities'
 
 type Props = {
     videoId: string
@@ -24,6 +26,8 @@ const VideoPreview = ({ videoId }: Props) => {
     getPreviewVideo(videoId)
   )
 
+  const notifyFirstView = async () => await sendEmailForFirstView(videoId)
+
   const { data: video, status, author } = data as VideoProps
   if (status !== 200) router.push('/')
 
@@ -31,8 +35,17 @@ const VideoPreview = ({ videoId }: Props) => {
     (new Date().getTime() - video.createdAt.getTime()) / (24 * 60 * 60 * 1000)
   )
 
+  useEffect(() => {
+    if (video.views === 0) {
+      notifyFirstView()
+    }
+    return () => {
+      notifyFirstView()
+    }
+  }, [])
+
   return (
-    <div className='grid grid-cols-1 xl:grid-cols-3 p-10 lg:px-20 lg:py-10 overflow-y-auto gap-5'>
+    <div className='grid grid-cols-1 xl:grid-cols-3 lg:py-10 overflow-y-auto gap-5'>
       <div className='flex flex-col lg:col-span-2 gap-y-10'>
         <div>
             <div className='flex gap-x-5 items-start justify-between'>
@@ -46,6 +59,7 @@ const VideoPreview = ({ videoId }: Props) => {
                 ) : (
                     <></>
                 )} */}
+                gdh
             </div>
             <span className='flex gap-x-3 mt-2'>
                 <p className='text-[#9D9D9D] capitalize'>
@@ -98,13 +112,24 @@ const VideoPreview = ({ videoId }: Props) => {
           />
           <Download className='text-white'/>
         </div>
+        <div>
+          <TabMenu 
+            defaultValue='Ai tools' 
+            triggers={['Ai tools', 'Transcript', 'Activity']}
+          >
+            <AiTools
+              videoId={videoId}
+              trial={video.User?.trial!}
+              plan={video.User?.subscription?.plan!}
+            />
+            <VideoTranscript transcript={video.description!}/>
+            <Activities 
+              author={video.User?.firstname as string}
+              videoId={videoId}
+            />
+          </TabMenu>
+        </div>
       </div>
-      <TabMenu 
-        defaultValue='Ai tools' 
-        triggers={['Ai tools', 'Transcript', 'Activity']}
-      >
-        <AiTools/>
-      </TabMenu>
     </div>
   )
 }

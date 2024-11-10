@@ -29,8 +29,6 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { useQueryData } from '@/hooks/useQueryData'
 import InfoBar from '../info-bar'
 import Loader from '../loader'
-import { useDispatch } from 'react-redux'
-import { WORKSPACES } from '@/redux/slices/workspaces'
 type Props = {
   activeWorkspaceId: string
 }
@@ -39,7 +37,6 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
 
   const router = useRouter()
   const pathName = usePathname()
-  const dispatch = useDispatch()
 
   const { data, isFetched } = useQueryData(['user-workspaces'], getWorkSpaces)
   const menuItems = MENU_ITEMS(activeWorkspaceId)
@@ -59,10 +56,10 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
     (s) => s.id === activeWorkspaceId
   )
 
-  if (isFetched && workspace) {
-    dispatch(WORKSPACES({ workspaces: workspace.workspace }))
-  }
-  
+  // if (isFetched && workspace) {
+  //   dispatch(WORKSPACES({ workspaces: workspace.workspace }))
+  // }
+
   const SidebarSection = (
     <div className="bg-[#111111] flex-none relative p-4 h-full w-[250px] flex flex-col gap-4 items-center overflow-hidden">
       <div className="bg-[#111111] p-4 flex gap-2 justify-center items-center mb-4 absolute top-0 left-0 right-0 ">

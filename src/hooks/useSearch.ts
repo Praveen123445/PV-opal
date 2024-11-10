@@ -46,7 +46,6 @@ export const useSearch = (key: string, type: 'USERS') => {
     if (debounce) refetch()
     if (!debounce) setOnUsers(undefined)
     return () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       debounce
     }
   }, [debounce])

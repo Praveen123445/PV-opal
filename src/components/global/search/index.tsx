@@ -8,6 +8,7 @@ import { User } from 'lucide-react'
 
 import React from 'react'
 import Loader from '../loader'
+import { inviteMembers } from '@/actions/user'
 
 type Props = {
   workspaceId: string
@@ -18,8 +19,6 @@ const Search = ({ workspaceId }: Props) => {
     'get-users',
     'USERS'
   )
-
-
 
   const { mutate, isPending } = useMutationData(
     ['invite-member'],
