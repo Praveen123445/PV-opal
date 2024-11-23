@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
     MutationFunction,
     MutationKey,
@@ -9,7 +10,7 @@ import {
   
   export const useMutationData = (
     mutationKey: MutationKey,
-    mutationFn: MutationFunction<any, any>,
+    mutationFn: MutationFunction<any>,
     queryKey?: string,
     onSuccess?: () => void
   ) => {

@@ -1,4 +1,3 @@
-
 'use client'
 import { getWorkSpaces } from '@/actions/workspace'
 import {
@@ -22,13 +21,15 @@ import Search from '../search'
 import { MENU_ITEMS } from '@/constants'
 import SidebarItem from './sidebar-item'
 import { getNotifications } from '@/actions/user'
+import { useQueryData } from '@/hooks/useQueryData'
 import WorkspacePlaceholder from './workspace-placeholder'
 import GlobalCard from '../global-card'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { useQueryData } from '@/hooks/useQueryData'
 import InfoBar from '../info-bar'
-import Loader from '../loader'
+import { useDispatch } from 'react-redux'
+import { WORKSPACES } from '@/redux/slices/workspaces'
+import PaymentButton from '../payment-button'
 type Props = {
   activeWorkspaceId: string
 }
@@ -37,6 +38,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
 
   const router = useRouter()
   const pathName = usePathname()
+  const dispatch = useDispatch()
 
   const { data, isFetched } = useQueryData(['user-workspaces'], getWorkSpaces)
   const menuItems = MENU_ITEMS(activeWorkspaceId)
@@ -56,9 +58,9 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
     (s) => s.id === activeWorkspaceId
   )
 
-  // if (isFetched && workspace) {
-  //   dispatch(WORKSPACES({ workspaces: workspace.workspace }))
-  // }
+  if (isFetched && workspace) {
+    dispatch(WORKSPACES({ workspaces: workspace.workspace }))
+  }
 
   const SidebarSection = (
     <div className="bg-[#111111] flex-none relative p-4 h-full w-[250px] flex flex-col gap-4 items-center overflow-hidden">
@@ -200,16 +202,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
         <GlobalCard
           title="Upgrade to Pro"
           description=" Unlock AI features like transcription, AI summary, and more."
-          footer={
-            <Button className='text-sm w-full'>
-              <Loader
-                color='#000'
-                state={false}
-              >
-                Upgrade
-              </Loader>
-            </Button>
-          }
+          footer={<PaymentButton />}
         />
       )}
     </div>

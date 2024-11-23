@@ -1,16 +1,16 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
-import { custom } from "zod";
+import { currentUser } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
+import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_CLIENT_SECRET as string);
+const stripe = new Stripe(process.env.STRIPE_CLIENT_SECRET as string)
 
 export async function GET() {
-  const user = await currentUser();
-  if (!user) return NextResponse.json({ status: 404 });
-  const priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID;
+  console.log(process.env.STRIPE_CLIENT_SECRET, 'GEt endpoint hit👉🏻')
+  const user = await currentUser()
+  if (!user) return NextResponse.json({ status: 404 })
+  const priceId = process.env.STRIPE_SUBSCRIPTION_PRICE_ID
   const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
+    mode: 'subscription',
     line_items: [
       {
         price: priceId,
@@ -23,10 +23,11 @@ export async function GET() {
 
   if (session) {
     return NextResponse.json({
-        status: 200,
-        session_url: session.url,
-        customer_id: session.customer,
+      status: 200,
+      session_url: session.url,
+      customer_id: session.customer,
     })
   }
+
   return NextResponse.json({ status: 400 })
 }

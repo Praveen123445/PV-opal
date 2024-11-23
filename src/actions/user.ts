@@ -1,8 +1,11 @@
-"use server";
+'use server'
 
-import { client } from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs/server";
-import nodemailer from "nodemailer";
+import { client } from '@/lib/prisma'
+import { currentUser } from '@clerk/nextjs/server'
+import nodemailer from 'nodemailer'
+import Stripe from 'stripe'
+
+const stripe = new Stripe(process.env.STRIPE_CLIENT_SECRET as string)
 
 export const sendEmail = async (
   to: string,
@@ -10,23 +13,24 @@ export const sendEmail = async (
   text: string,
   html?: string
 ) => {
-  const transporter = await nodemailer.createTransport({
-    host: "smpt.gmail.com",
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
     port: 465,
     secure: true,
     auth: {
       user: process.env.MAILER_EMAIL,
       pass: process.env.MAILER_PASSWORD,
     },
-  });
+  })
+
   const mailOptions = {
     to,
     subject,
     text,
     html,
-  };
-  return { transporter, mailOptions };
-};
+  }
+  return { transporter, mailOptions }
+}
 
 export const onAuthenticateUser = async () => {
   try {
@@ -92,16 +96,16 @@ export const onAuthenticateUser = async () => {
       return { status: 201, user: newUser }
     }
     return { status: 400 }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    console.error('🔴 ERROR', error)
     return { status: 500 }
   }
 }
 
 export const getNotifications = async () => {
   try {
-    const user = await currentUser();
-    if (!user) return { status: 404 };
+    const user = await currentUser()
+    if (!user) return { status: 404 }
     const notifications = await client.user.findUnique({
       where: {
         clerkid: user.id,
@@ -114,21 +118,21 @@ export const getNotifications = async () => {
           },
         },
       },
-    });
+    })
 
     if (notifications && notifications.notification.length > 0)
-      return { status: 200, data: notifications };
-    return { status: 404, data: [] };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return { status: 200, data: notifications }
+    return { status: 404, data: [] }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    return { status: 400, data: [] };
+    return { status: 400, data: [] }
   }
-};
+}
 
 export const searchUsers = async (query: string) => {
   try {
-    const user = await currentUser();
-    if (!user) return { status: 404 };
+    const user = await currentUser()
+    if (!user) return { status: 404 }
 
     const users = await client.user.findMany({
       where: {
@@ -151,23 +155,23 @@ export const searchUsers = async (query: string) => {
         image: true,
         email: true,
       },
-    });
+    })
 
     if (users && users.length > 0) {
-      return { status: 200, data: users };
+      return { status: 200, data: users }
     }
 
-    return { status: 404, data: undefined };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return { status: 404, data: undefined }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    return { status: 500, data: undefined };
+    return { status: 500, data: undefined }
   }
-};
+}
 
 export const getPaymentInfo = async () => {
   try {
-    const user = await currentUser();
-    if (!user) return { status: 404 };
+    const user = await currentUser()
+    if (!user) return { status: 404 }
 
     const payment = await client.user.findUnique({
       where: {
@@ -178,21 +182,21 @@ export const getPaymentInfo = async () => {
           select: { plan: true },
         },
       },
-    });
+    })
     if (payment) {
-      return { status: 200, data: payment };
+      return { status: 200, data: payment }
     }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    return { status: 400 };
+    return { status: 400 }
   }
-};
+}
 
 export const enableFirstView = async (state: boolean) => {
   try {
-    const user = await currentUser();
+    const user = await currentUser()
 
-    if (!user) return { status: 404 };
+    if (!user) return { status: 404 }
 
     const view = await client.user.update({
       where: {
@@ -201,21 +205,21 @@ export const enableFirstView = async (state: boolean) => {
       data: {
         firstView: state,
       },
-    });
+    })
 
     if (view) {
-      return { status: 200, data: "Setting updated" };
+      return { status: 200, data: 'Setting updated' }
     }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    return { status: 400 };
+    return { status: 400 }
   }
-};
+}
 
 export const getFirstView = async () => {
   try {
-    const user = await currentUser();
-    if (!user) return { status: 404 };
+    const user = await currentUser()
+    if (!user) return { status: 404 }
     const userData = await client.user.findUnique({
       where: {
         clerkid: user.id,
@@ -223,16 +227,16 @@ export const getFirstView = async () => {
       select: {
         firstView: true,
       },
-    });
+    })
     if (userData) {
-      return { status: 200, data: userData.firstView };
+      return { status: 200, data: userData.firstView }
     }
-    return { status: 400, data: false };
+    return { status: 400, data: false }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    return { status: 400 };
+    return { status: 400 }
   }
-};
+}
 
 export const createCommentAndReply = async (
   userId: string,
@@ -255,9 +259,9 @@ export const createCommentAndReply = async (
             },
           },
         },
-      });
+      })
       if (reply) {
-        return { status: 200, data: "Reply posted" };
+        return { status: 200, data: 'Reply posted' }
       }
     }
 
@@ -273,18 +277,18 @@ export const createCommentAndReply = async (
           },
         },
       },
-    });
-    if (newComment) return { status: 200, data: "New comment added" };
+    })
+    if (newComment) return { status: 200, data: 'New comment added' }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    return { status: 400 };
+    return { status: 400 }
   }
-};
+}
 
 export const getUserProfile = async () => {
   try {
-    const user = await currentUser();
-    if (!user) return { status: 404 };
+    const user = await currentUser()
+    if (!user) return { status: 404 }
     const profileIdAndImage = await client.user.findUnique({
       where: {
         clerkid: user.id,
@@ -293,14 +297,14 @@ export const getUserProfile = async () => {
         image: true,
         id: true,
       },
-    });
+    })
 
-    if (profileIdAndImage) return { status: 200, data: profileIdAndImage };
+    if (profileIdAndImage) return { status: 200, data: profileIdAndImage }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    return { status: 400 };
+    return { status: 400 }
   }
-};
+}
 
 export const getVideoComments = async (Id: string) => {
   try {
@@ -317,14 +321,14 @@ export const getVideoComments = async (Id: string) => {
         },
         User: true,
       },
-    });
+    })
 
-    return { status: 200, data: comments };
+    return { status: 200, data: comments }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    return { status: 400 };
+    return { status: 400 }
   }
-};
+}
 
 export const inviteMembers = async (
   workspaceId: string,
@@ -409,23 +413,25 @@ export const inviteMembers = async (
 export const acceptInvite = async (inviteId: string) => {
   try {
     const user = await currentUser()
-    if(!user) return {
-      status: 404,
-    }
+    if (!user)
+      return {
+        status: 404,
+      }
     const invitation = await client.invite.findUnique({
       where: {
         id: inviteId,
       },
       select: {
         workSpaceId: true,
-        reciever:{
+        reciever: {
           select: {
             clerkid: true,
           },
         },
       },
     })
-    if(user.id !== invitation?.reciever?.clerkid) return { status: 401}
+
+    if (user.id !== invitation?.reciever?.clerkid) return { status: 401 }
     const acceptInvite = client.invite.update({
       where: {
         id: inviteId,
@@ -434,6 +440,7 @@ export const acceptInvite = async (inviteId: string) => {
         accepted: true,
       },
     })
+
     const updateMember = client.user.update({
       where: {
         clerkid: user.id,
@@ -446,6 +453,7 @@ export const acceptInvite = async (inviteId: string) => {
         },
       },
     })
+
     const membersTransaction = await client.$transaction([
       acceptInvite,
       updateMember,
@@ -459,4 +467,37 @@ export const acceptInvite = async (inviteId: string) => {
   } catch (error) {
     return { status: 400 }
   }
-};
+}
+
+export const completeSubscription = async (session_id: string) => {
+  try {
+    const user = await currentUser()
+    if (!user) return { status: 404 }
+
+    const session = await stripe.checkout.sessions.retrieve(session_id)
+    if (session) {
+      const customer = await client.user.update({
+        where: {
+          clerkid: user.id,
+        },
+        data: {
+          subscription: {
+            update: {
+              data: {
+                customerId: session.customer as string,
+                plan: 'PRO',
+              },
+            },
+          },
+        },
+      })
+      if (customer) {
+        return { status: 200 }
+      }
+    }
+    return { status: 404 }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return { status: 400 }
+  }
+}
